@@ -1,0 +1,10 @@
+# ATM Signs
+# by ellbristow
+# 
+# Configuration File
+# 
+# item: What item is deposited/withdrawn at the ATM? 
+# currency: How much currency is each item worth? 
+
+item: 266;
+currency: 1;

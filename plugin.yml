@@ -1,0 +1,20 @@
+name: ATMsigns
+main: me.ellbristow.ATMsigns.ATMsigns
+version: 0.0.1
+author: ellbristow
+description: >
+             Deposit/Withdraw items for currency using signs.
+depend: [Vault]
+permissions:
+  atmsigns.*:
+    description: All permissions.
+    children:
+      atmsigns.create: true
+      atmsigns.break: true
+      atmsigns.use: true
+  atmsigns.create:
+    description: Can create deposit and withdraw signs.
+  atmsigns.break:
+    description: Can destroy ATM signs.
+  atmsigns.use:
+    description: Can use ATM signs.
