@@ -1,6 +1,6 @@
 name: ATMsigns
 main: me.ellbristow.ATMsigns.ATMsigns
-version: 0.0.1
+version: 1.0.0
 author: ellbristow
 description: >
              Deposit/Withdraw items for currency using signs.

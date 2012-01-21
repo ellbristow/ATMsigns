@@ -4,7 +4,19 @@
 # Configuration File
 # 
 # item: What item is deposited/withdrawn at the ATM? 
-# currency: How much currency is each item worth? 
+# currency: How much currency is each item worth?
+# 
+# alt_item1: First alternative item accepted for deposit
+# (999 = disabled)
+# alt_item1_curr: Currency value of alternative item 1
+# 
+# alt_item2: First alternative item accepted for deposit
+# (999 = disabled)
+# alt_item2_curr: Currency value of alternative item 1
 
 item: 266;
 currency: 1;
+alt_item1: 999;
+alt_item1_curr: 0;
+alt_item2: 999;
+alt_item2_curr: 0;

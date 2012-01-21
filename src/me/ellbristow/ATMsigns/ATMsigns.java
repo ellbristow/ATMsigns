@@ -24,6 +24,10 @@ public class ATMsigns extends JavaPlugin {
 	protected FileConfiguration config;
 	public static int item;
 	public static int currency;
+	public static int altItem1;
+	public static int altItem1Curr;
+	public static int altItem2;
+	public static int altItem2Curr;
 	public static Economy economy;
 	public final playerListener playerListener = new playerListener(this, economy);
 
@@ -46,9 +50,44 @@ public class ATMsigns extends JavaPlugin {
 			this.config = this.getConfig();
 			item = this.config.getInt("item", 266);
 			currency = this.config.getInt("currency", 1);
+			altItem1 = this.config.getInt("alt_item1", 999);
+			altItem1Curr = this.config.getInt("alt_item1_curr", 0);
+			altItem2 = this.config.getInt("alt_item2", 999);
+			altItem2Curr = this.config.getInt("alt_item2_curr", 0);
 			this.config.set("item", item);
 			this.config.set("currency", currency);
+			this.config.set("alt_item1", altItem1);
+			this.config.set("alt_item1_curr", altItem1Curr);
+			this.config.set("alt_item2", altItem2);
+			this.config.set("alt_item2_curr", altItem2Curr);
 			this.saveConfig();
+			Material checkItem = null;
+			boolean checkFailed = false;
+			checkItem = Material.getMaterial(item); 
+			if (checkItem == null) {
+				logger.severe("Item ID " + item + " not found!");
+				logger.severe("[" + pdfFile.getName() + "] will be disabled");
+				checkFailed = true;
+			}
+			if (altItem1 != 999) {
+				checkItem = Material.getMaterial(altItem1); 
+				if (checkItem == null) {
+					logger.severe("Item ID " + altItem1 + " not found!");
+					logger.severe("[" + pdfFile.getName() + "] will be disabled");
+					checkFailed = true;
+				}
+			}
+			if (altItem2 != 999) {
+				checkItem = Material.getMaterial(altItem2); 
+				if (checkItem == null) {
+					logger.severe("Item ID " + altItem2 + " not found!");
+					logger.severe("[" + pdfFile.getName() + "] will be disabled");
+					checkFailed = true;
+				}
+			}
+			if (checkFailed) {
+				pm.disablePlugin(this);
+			}
 		}
 		else {
 			logger.severe("[" + pdfFile.getName() + "] failed to link to Vault." );
@@ -66,16 +105,39 @@ public class ATMsigns extends JavaPlugin {
 	}
 	
 	public static void depositItem(Player player) {
-		if (player.getItemInHand().getTypeId() == item) {
+		if (player.getItemInHand().getTypeId() == item || player.getItemInHand().getTypeId() == altItem1 || player.getItemInHand().getTypeId() == altItem2) {
 			// Correct item in hand
 			int count = player.getItemInHand().getAmount();
 			player.setItemInHand(new ItemStack(Material.AIR, 0));
-			economy.depositPlayer( player.getName(), currency * count );
-			player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(item).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) currency * count).replace(".00", ""));
+			if (player.getItemInHand().getTypeId() == item) {
+				economy.depositPlayer( player.getName(), currency * count );
+				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(item).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) currency * count).replace(".00", ""));
+			}
+			else if (player.getItemInHand().getTypeId() == altItem1) {
+				economy.depositPlayer( player.getName(), altItem1Curr * count );
+				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(altItem1).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) altItem1Curr * count).replace(".00", ""));
+			}
+			else if (player.getItemInHand().getTypeId() == altItem2) {
+				economy.depositPlayer( player.getName(), altItem2Curr * count );
+				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(altItem2).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) altItem2Curr * count).replace(".00", ""));
+			}
 		}
 		else {
 			// Wrong item in hand
-			player.sendMessage(ChatColor.RED + "You can only deposit " +  ChatColor.WHITE + Material.getMaterial(item).toString().replace("_", " ") + ChatColor.RED + "s!");
+			String alternatives = "";
+			if (altItem1 != 999) {
+				if (altItem2 != 999) {
+					alternatives += ", ";
+				}
+				else {
+					alternatives += " or ";
+				}
+				alternatives += Material.getMaterial(altItem1).toString().replace("_", " ");
+			}
+			if (altItem2 != 999) {
+				alternatives += " or " + Material.getMaterial(altItem1).toString().replace("_", " ");
+			}
+			player.sendMessage(ChatColor.RED + "You can only deposit " +  ChatColor.WHITE + Material.getMaterial(item).toString().replace("_", " ") + alternatives + ChatColor.RED + "s!");
 		}
 	}
 	
