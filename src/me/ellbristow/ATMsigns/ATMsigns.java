@@ -23,11 +23,11 @@ public class ATMsigns extends JavaPlugin {
 	public final signListener blockListener = new signListener(this);
 	protected FileConfiguration config;
 	public static int item;
-	public static int currency;
+	public static double currency;
 	public static int altItem1;
-	public static int altItem1Curr;
+	public static double altItem1Curr;
 	public static int altItem2;
-	public static int altItem2Curr;
+	public static double altItem2Curr;
 	public static Economy economy;
 	public final playerListener playerListener = new playerListener(this, economy);
 
@@ -49,11 +49,11 @@ public class ATMsigns extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Normal, this);
 			this.config = this.getConfig();
 			item = this.config.getInt("item", 266);
-			currency = this.config.getInt("currency", 1);
+			currency = this.config.getDouble("currency", 1);
 			altItem1 = this.config.getInt("alt_item1", 999);
-			altItem1Curr = this.config.getInt("alt_item1_curr", 0);
+			altItem1Curr = this.config.getDouble("alt_item1_curr", 0);
 			altItem2 = this.config.getInt("alt_item2", 999);
-			altItem2Curr = this.config.getInt("alt_item2_curr", 0);
+			altItem2Curr = this.config.getDouble("alt_item2_curr", 0);
 			this.config.set("item", item);
 			this.config.set("currency", currency);
 			this.config.set("alt_item1", altItem1);
@@ -128,15 +128,15 @@ public class ATMsigns extends JavaPlugin {
 			String alternatives = "";
 			if (altItem1 != 999) {
 				if (altItem2 != 999) {
-					alternatives += ", ";
+					alternatives += ChatColor.RED + "s, " + ChatColor.WHITE;
 				}
 				else {
-					alternatives += " or ";
+					alternatives += ChatColor.RED + "s or " + ChatColor.WHITE;
 				}
 				alternatives += Material.getMaterial(altItem1).toString().replace("_", " ");
 			}
 			if (altItem2 != 999) {
-				alternatives += " or " + Material.getMaterial(altItem1).toString().replace("_", " ");
+				alternatives += ChatColor.RED + "s or " + ChatColor.WHITE + Material.getMaterial(altItem2).toString().replace("_", " ");
 			}
 			player.sendMessage(ChatColor.RED + "You can only deposit " +  ChatColor.WHITE + Material.getMaterial(item).toString().replace("_", " ") + alternatives + ChatColor.RED + "s!");
 		}
