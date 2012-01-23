@@ -107,17 +107,18 @@ public class ATMsigns extends JavaPlugin {
 	public static void depositItem(Player player) {
 		if (player.getItemInHand().getTypeId() == item || player.getItemInHand().getTypeId() == altItem1 || player.getItemInHand().getTypeId() == altItem2) {
 			// Correct item in hand
+			int depItem = player.getItemInHand().getTypeId();
 			int count = player.getItemInHand().getAmount();
 			player.setItemInHand(new ItemStack(Material.AIR, 0));
-			if (player.getItemInHand().getTypeId() == item) {
+			if (depItem == item) {
 				economy.depositPlayer( player.getName(), currency * count );
 				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(item).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) currency * count).replace(".00", ""));
 			}
-			else if (player.getItemInHand().getTypeId() == altItem1) {
+			else if (depItem == altItem1) {
 				economy.depositPlayer( player.getName(), altItem1Curr * count );
 				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(altItem1).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) altItem1Curr * count).replace(".00", ""));
 			}
-			else if (player.getItemInHand().getTypeId() == altItem2) {
+			else if (depItem == altItem2) {
 				economy.depositPlayer( player.getName(), altItem2Curr * count );
 				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(altItem2).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) altItem2Curr * count).replace(".00", ""));
 			}
