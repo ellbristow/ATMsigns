@@ -6,11 +6,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.SignChangeEvent;
 
-public class signListener extends BlockListener {
+public class signListener implements Listener {
 	
 	public static ATMsigns plugin;
 	
@@ -20,6 +22,7 @@ public class signListener extends BlockListener {
 		
 	}
 	
+	@EventHandler (priority = EventPriority.NORMAL)
 	public void onSignChange (SignChangeEvent event) {
 		SignChangeEvent sign = event;
 		Player player = event.getPlayer();
@@ -37,6 +40,7 @@ public class signListener extends BlockListener {
 		}
 	}
 	
+	@EventHandler (priority = EventPriority.NORMAL)
 	public void onBlockBreak (BlockBreakEvent event) {
 		Block block = event.getBlock();
 		if (block.getTypeId() == 63 || block.getTypeId() == 68) {

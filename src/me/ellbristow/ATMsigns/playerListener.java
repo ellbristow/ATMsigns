@@ -8,11 +8,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerListener;
 
-public class playerListener extends PlayerListener {
+public class playerListener implements Listener {
 
 	public static ATMsigns plugin;
 	public static Economy economy;
@@ -23,6 +25,7 @@ public class playerListener extends PlayerListener {
 		economy = eco;
 	}
 	
+	@EventHandler (priority = EventPriority.NORMAL)
 	public void onPlayerInteract (PlayerInteractEvent event) {
 		if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && (event.getClickedBlock().getType().name().equals("SIGN_POST") || event.getClickedBlock().getType().name().equals("WALL_SIGN"))) {
 			Block block = event.getClickedBlock();

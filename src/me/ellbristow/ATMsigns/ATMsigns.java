@@ -8,7 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -44,9 +43,8 @@ public class ATMsigns extends JavaPlugin {
 		logger.info("[" + pdfFile.getName() + "] version " + pdfFile.getVersion() + " is now enabled." );
 		if (initEconomy() && economy != null) {
 			logger.info("[" + pdfFile.getName() + "] hooked in to Vault." );
-			pm.registerEvent(Event.Type.SIGN_CHANGE, this.blockListener, Event.Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Event.Priority.Normal, this);
-			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Normal, this);
+			pm.registerEvents(blockListener, this);
+			pm.registerEvents(playerListener, this);
 			this.config = this.getConfig();
 			item = this.config.getInt("item", 266);
 			currency = this.config.getDouble("currency", 1);
