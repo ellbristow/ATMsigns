@@ -13,6 +13,15 @@
 # alt_item2: First alternative item accepted for deposit
 # (999 = disabled)
 # alt_item2_curr: Currency value of alternative item 1
+# 
+# deposit_fee: How much does the player pay to deposit at an ATM?
+# 
+# withdraw_fee: How much does the player pay to withdraw at an ATM?
+# 
+# percentage_fee: Is the fee a percentage (or a flat amount)?
+#
+# fee_to_owner: Does the sign owner receive the fee?
+# 
 
 item: 266;
 currency: 1;
@@ -20,3 +29,7 @@ alt_item1: 999;
 alt_item1_curr: 0;
 alt_item2: 999;
 alt_item2_curr: 0;
+deposit_fee: 0.00;
+withdraw_fee: 0.00;
+percentage_fee: false;
+fee_to_owner: true;

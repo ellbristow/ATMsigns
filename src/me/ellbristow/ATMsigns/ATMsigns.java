@@ -1,5 +1,6 @@
 package me.ellbristow.ATMsigns;
 
+import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
@@ -16,8 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ATMsigns extends JavaPlugin {
 	
-	public static ATMsigns plugin;
-	
+	public static ATMsigns plugin;	
 	public final Logger logger = Logger.getLogger("Minecraft");
 	public final signListener blockListener = new signListener(this);
 	protected FileConfiguration config;
@@ -27,6 +27,10 @@ public class ATMsigns extends JavaPlugin {
 	public static double altItem1Curr;
 	public static int altItem2;
 	public static double altItem2Curr;
+	public static double depositFee;
+	public static double withdrawFee;
+	public static boolean percentFee;
+	public static boolean feeToOwner;
 	public static Economy economy;
 	public final playerListener playerListener = new playerListener(this, economy);
 
@@ -52,12 +56,20 @@ public class ATMsigns extends JavaPlugin {
 			altItem1Curr = this.config.getDouble("alt_item1_curr", 0);
 			altItem2 = this.config.getInt("alt_item2", 999);
 			altItem2Curr = this.config.getDouble("alt_item2_curr", 0);
+			depositFee = this.config.getDouble("deposit_fee", 0);
+			withdrawFee = this.config.getDouble("withdraw_fee", 0);
+			percentFee = this.config.getBoolean("percentage_fee", false);
+			feeToOwner = this.config.getBoolean("fee_to_owner", true);
 			this.config.set("item", item);
 			this.config.set("currency", currency);
 			this.config.set("alt_item1", altItem1);
 			this.config.set("alt_item1_curr", altItem1Curr);
 			this.config.set("alt_item2", altItem2);
 			this.config.set("alt_item2_curr", altItem2Curr);
+			this.config.set("deposit_fee", depositFee);
+			this.config.set("withdraw_fee", withdrawFee);
+			this.config.set("percentage_fee", percentFee);
+			this.config.set("fee_to_owner", feeToOwner);
 			this.saveConfig();
 			Material checkItem = null;
 			boolean checkFailed = false;
@@ -102,23 +114,45 @@ public class ATMsigns extends JavaPlugin {
 		return false;
 	}
 	
-	public static void depositItem(Player player) {
+	public void depositItem(Player player, String owner) {
 		if (player.getItemInHand().getTypeId() == item || player.getItemInHand().getTypeId() == altItem1 || player.getItemInHand().getTypeId() == altItem2) {
 			// Correct item in hand
 			int depItem = player.getItemInHand().getTypeId();
 			int count = player.getItemInHand().getAmount();
 			player.setItemInHand(new ItemStack(Material.AIR, 0));
+			double total = 0;
 			if (depItem == item) {
 				economy.depositPlayer( player.getName(), currency * count );
 				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(item).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) currency * count).replace(".00", ""));
+				total = currency * count;
 			}
 			else if (depItem == altItem1) {
 				economy.depositPlayer( player.getName(), altItem1Curr * count );
 				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(altItem1).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) altItem1Curr * count).replace(".00", ""));
+				total = altItem1Curr * count;
 			}
 			else if (depItem == altItem2) {
 				economy.depositPlayer( player.getName(), altItem2Curr * count );
 				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + Material.getMaterial(altItem2).toString().replace("_", " ") + "(s)" + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) altItem2Curr * count).replace(".00", ""));
+				total = altItem2Curr * count;
+			}
+			if (depositFee != 0 && owner != player.getName()) {
+				double fee = 0;
+				if (percentFee) {
+					fee = roundTwoDecimals(total / 100 * depositFee);
+				}
+				else {
+					fee = depositFee;
+				}
+				economy.withdrawPlayer(player.getName(), fee);
+				player.sendMessage(ChatColor.GOLD + "Deposit Fee: " + ChatColor.WHITE + economy.format(fee));
+				if (feeToOwner) {
+					economy.depositPlayer(owner, fee);
+					if (getServer().getOfflinePlayer(owner).isOnline()) {
+						Player target = getServer().getPlayer(owner);	
+						target.sendMessage(ChatColor.GOLD + "ATM fee of " + ChatColor.WHITE + economy.format(fee) + ChatColor.GOLD + " received from " + ChatColor.WHITE + player.getName());
+					}
+				}
 			}
 		}
 		else {
@@ -140,13 +174,31 @@ public class ATMsigns extends JavaPlugin {
 		}
 	}
 	
-	public static void withdrawItem(Player player) {
-		if (economy.has(player.getName(), currency)) {
+	public void withdrawItem(Player player, String owner) {
+		double fee = 0;
+		if (withdrawFee != 0 && owner != player.getName()) {
+			if (percentFee) {
+				fee = roundTwoDecimals(currency / 100 * withdrawFee);
+			}
+			else {
+				fee = withdrawFee;
+			}
+		}
+		if (economy.has(player.getName(), currency + fee)) {
 			// Enough in account
 			if (player.getItemInHand().getTypeId() == 0 || (player.getItemInHand().getTypeId() == item && player.getItemInHand().getAmount() < player.getItemInHand().getType().getMaxStackSize())) {
 				player.setItemInHand(new ItemStack(item, player.getItemInHand().getAmount() + 1));
-				economy.withdrawPlayer( player.getName(), currency );
+				economy.withdrawPlayer( player.getName(), currency + fee);
 				player.sendMessage(ChatColor.GREEN + "Withdrawn: " + ChatColor.GOLD + "1 " + Material.getMaterial(item).toString().replace("_"," ") + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double)currency).replace(".00", ""));
+				if (fee != 0) {
+					player.sendMessage(ChatColor.GOLD + "Withdrawl Fee: " + ChatColor.WHITE + economy.format(fee));
+					if (feeToOwner) {
+						economy.depositPlayer(owner, fee);
+						if (getServer().getPlayer(owner).isOnline()) {
+							getServer().getPlayer(owner).sendMessage(ChatColor.GOLD + "ATM fee of " + ChatColor.WHITE + fee + ChatColor.GOLD + " received from " + ChatColor.WHITE + player.getName());
+						}
+					}
+				}
 			}
 			else {
 				player.sendMessage(ChatColor.RED + "You must have a free hand to withdraw " + Material.getMaterial(item).name().toString().replace("_", " ") + "s!");
@@ -155,10 +207,18 @@ public class ATMsigns extends JavaPlugin {
 		else {
 			// Not enough in account
 			player.sendMessage(ChatColor.RED + "Your balance is too low to withdraw a " +  ChatColor.WHITE + Material.getMaterial(item).toString().replace("_", " ") + ChatColor.RED + "!");
+			if (fee != 0) {
+				player.sendMessage(ChatColor.RED + "Total required: " + ChatColor.WHITE + currency + ChatColor.RED + " Fee: " + ChatColor.WHITE + fee + ChatColor.RED + " Total: " + ChatColor.WHITE + economy.format((currency + fee)));
+			}
 		}
 	}
 	
-	public static void getBalance(Player player) {
+	public void getBalance(Player player) {
 		player.sendMessage(ChatColor.GREEN + "Balance: " + economy.format((double)economy.getBalance(player.getName())).replace(".00", ""));
 	}
+	
+	double roundTwoDecimals(double d) {
+        DecimalFormat twoDForm = new DecimalFormat("#.##");
+    return Double.valueOf(twoDForm.format(d));
+}
 }
