@@ -194,7 +194,7 @@ public class ATMsigns extends JavaPlugin {
 					player.sendMessage(ChatColor.GOLD + "Withdrawl Fee: " + ChatColor.WHITE + economy.format(fee));
 					if (feeToOwner) {
 						economy.depositPlayer(owner, fee);
-						if (getServer().getPlayer(owner).isOnline()) {
+						if (getServer().getOfflinePlayer(owner).isOnline()) {
 							getServer().getPlayer(owner).sendMessage(ChatColor.GOLD + "ATM fee of " + ChatColor.WHITE + fee + ChatColor.GOLD + " received from " + ChatColor.WHITE + player.getName());
 						}
 					}

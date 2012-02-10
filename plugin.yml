@@ -1,7 +1,8 @@
 name: ATMsigns
 main: me.ellbristow.ATMsigns.ATMsigns
-version: 1.2
+version: 1.2.2
 author: ellbristow
+dev-url: http://dev.bukkit.org/server-mods/atmsigns
 description: >
              Deposit/Withdraw items for currency using signs.
 depend: [Vault]
