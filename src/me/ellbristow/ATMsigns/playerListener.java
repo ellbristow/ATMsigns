@@ -1,9 +1,7 @@
 package me.ellbristow.ATMsigns;
 
 import java.util.logging.Logger;
-
 import net.milkbowl.vault.economy.Economy;
-
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;

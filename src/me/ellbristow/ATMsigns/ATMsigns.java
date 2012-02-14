@@ -1,10 +1,9 @@
 package me.ellbristow.ATMsigns;
 
 import java.text.DecimalFormat;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import net.milkbowl.vault.economy.Economy;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -85,18 +84,18 @@ public class ATMsigns extends JavaPlugin {
 			this.config.set("percentage_fee", percentFee);
 			this.config.set("fee_to_owner", feeToOwner);
 			this.saveConfig();
-			Material checkItem = null;
+			Material checkItem;
 			boolean checkFailed = false;
 			checkItem = Material.getMaterial(item); 
 			if (checkItem == null) {
-				logger.severe("Item ID " + item + " not found!");
+				logger.log(Level.SEVERE, "Item ID {0} not found!", item);
 				logger.severe("will be disabled!");
 				checkFailed = true;
 			}
 			if (altItem1 != 999) {
 				checkItem = Material.getMaterial(altItem1); 
 				if (checkItem == null) {
-					logger.severe("Item ID " + altItem1 + " not found!");
+					logger.log(Level.SEVERE, "Item ID {0} not found!", altItem1);
 					logger.severe("will be disabled!");
 					checkFailed = true;
 				}
@@ -104,7 +103,7 @@ public class ATMsigns extends JavaPlugin {
 			if (altItem2 != 999) {
 				checkItem = Material.getMaterial(altItem2); 
 				if (checkItem == null) {
-					logger.severe("Item ID " + altItem2 + " not found!");
+					logger.log(Level.SEVERE, "Item ID {0} not found!", altItem2);
 					logger.severe("will be disabled!");
 					checkFailed = true;
 				}
@@ -151,8 +150,8 @@ public class ATMsigns extends JavaPlugin {
 				player.sendMessage(ChatColor.GREEN + "Deposited: " + ChatColor.GOLD + count + " " + altItem2Name + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) altItem2Curr * count).replace(".00", ""));
 				total = altItem2Curr * count;
 			}
-			if (depositFee != 0 && owner != player.getName()) {
-				double fee = 0;
+			if (depositFee != 0 && !owner.equals(player.getName())) {
+				double fee;
 				if (percentFee) {
 					fee = roundTwoDecimals(total / 100 * depositFee);
 				}
@@ -191,7 +190,7 @@ public class ATMsigns extends JavaPlugin {
 	
 	public void withdrawItem(Player player, String owner) {
 		double fee = 0;
-		if (withdrawFee != 0 && owner != player.getName()) {
+		if (withdrawFee != 0 && !owner.equals(player.getName())) {
 			if (percentFee) {
 				fee = roundTwoDecimals(currency / 100 * withdrawFee);
 			}

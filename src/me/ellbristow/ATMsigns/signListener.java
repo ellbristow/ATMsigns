@@ -1,7 +1,6 @@
 package me.ellbristow.ATMsigns;
 
 import java.util.logging.Logger;
-
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -63,7 +62,7 @@ public class signListener implements Listener {
 			if (block.getTypeId() == 63 || block.getTypeId() == 68) {
 				Player player = event.getPlayer();
 				Sign sign = (Sign) block.getState();
-				if (sign.getLine(0) == ChatColor.WHITE + "=== ATM ===" && !player.hasPermission("atmsigns.break")) {
+				if ((ChatColor.WHITE + "=== ATM ===").equals(sign.getLine(0)) && !player.hasPermission("atmsigns.break")) {
 					if (!sign.getLine(3).equalsIgnoreCase(player.getName())) {
 						player.sendMessage(ChatColor.RED + "You can't break that ATM sign, it's not yours!");
 						event.setCancelled(true);
