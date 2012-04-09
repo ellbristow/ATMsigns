@@ -55,17 +55,21 @@ public class ATMsigns extends JavaPlugin {
 			}
 			currency = this.config.getDouble("currency", 1);
 			altItem1 = this.config.getInt("alt_item1", 999);
-			altItem1Name = this.config.getString("alt_item1_name", "default");
-			if (altItem1Name.equalsIgnoreCase("default")) {
-				altItem1Name = Material.getMaterial(altItem1).toString().replace("_", " ");
-			}
-			altItem1Curr = this.config.getDouble("alt_item1_curr", 0);
+                        if (altItem1 != 999) {
+                            altItem1Name = this.config.getString("alt_item1_name", "default");
+                            if (altItem1Name.equalsIgnoreCase("default")) {
+                                altItem1Name = Material.getMaterial(altItem1).toString().replace("_", " ");
+                            }
+                            altItem1Curr = this.config.getDouble("alt_item1_curr", 0);
+                        }
 			altItem2 = this.config.getInt("alt_item2", 999);
-			altItem2Name = this.config.getString("alt_item2_name", "default");
-			if (altItem2Name.equalsIgnoreCase("default")) {
-				altItem2Name = Material.getMaterial(altItem2).toString().replace("_", " ");
-			}
-			altItem2Curr = this.config.getDouble("alt_item2_curr", 0);
+                        if (altItem1 != 999) {
+                            altItem2Name = this.config.getString("alt_item2_name", "default");
+                            if (altItem2Name.equalsIgnoreCase("default")) {
+                                    altItem2Name = Material.getMaterial(altItem2).toString().replace("_", " ");
+                            }
+                            altItem2Curr = this.config.getDouble("alt_item2_curr", 0);
+                        }
 			depositFee = this.config.getDouble("deposit_fee", 0);
 			withdrawFee = this.config.getDouble("withdraw_fee", 0);
 			percentFee = this.config.getBoolean("percentage_fee", false);
@@ -129,6 +133,7 @@ public class ATMsigns extends JavaPlugin {
 	}
 	
 	public void depositItem(Player player, String owner) {
+                owner = ChatColor.stripColor(owner);
 		if (player.getItemInHand().getTypeId() == item || player.getItemInHand().getTypeId() == altItem1 || player.getItemInHand().getTypeId() == altItem2) {
 			// Correct item in hand
 			int depItem = player.getItemInHand().getTypeId();
