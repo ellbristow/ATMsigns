@@ -12,13 +12,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 
-public class signListener implements Listener {
+public class SignListener implements Listener {
 	
-	public static ATMsigns plugin;
+	private ATMsigns plugin;
 	
-	public final Logger logger = Logger.getLogger("Minecraft");
+	private static final Logger logger = Logger.getLogger("Minecraft");
 	
-	public signListener (ATMsigns instance) {
+	public SignListener (ATMsigns instance) {
 		plugin = instance;
 	}
 	
