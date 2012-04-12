@@ -12,14 +12,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class playerListener implements Listener {
+public class PlayerListener implements Listener {
 
-	public static ATMsigns plugin;
-	public static Economy economy;
+	private ATMsigns plugin;
+	private Economy economy;
 	
-	public final Logger logger = Logger.getLogger("Minecraft");
+	private static final Logger logger = Logger.getLogger("Minecraft");
 	
-	public playerListener (ATMsigns instance, Economy eco) {
+	public PlayerListener (ATMsigns instance, Economy eco) {
 		plugin = instance;
 		economy = eco;
 	}

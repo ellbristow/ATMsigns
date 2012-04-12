@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
@@ -15,102 +14,79 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ATMsigns extends JavaPlugin {
 
-	public static ATMsigns plugin;
-	public static Logger logger;
-	public final signListener blockListener = new signListener(this);
-	protected FileConfiguration config;
-	public static int item;
-	public static String itemName;
-	public static double currency;
-	public static int altItem1;
-	public static String altItem1Name;
-	public static double altItem1Curr;
-	public static int altItem2;
-	public static String altItem2Name;
-	public static double altItem2Curr;
-	public static double depositFee;
-	public static double withdrawFee;
-	public static boolean percentFee;
-	public static boolean feeToOwner;
-	public static Economy economy;
-	public final playerListener playerListener = new playerListener(this, economy);
+	private static final Logger logger = Logger.getLogger("Minecraft");
+	private Economy economy;
+	private final SignListener blockListener = new SignListener(this);
+	private final PlayerListener playerListener = new PlayerListener(this, economy);
 
-	@Override
-	public void onDisable() {
-	}
+	private int item;
+	private String itemName;
+	private double currency;
+	private int altItem1;
+	private String altItem1Name;
+	private double altItem1Curr;
+	private int altItem2;
+	private String altItem2Name;
+	private double altItem2Curr;
+	private double depositFee;
+	private double withdrawFee;
+	private boolean percentFee;
+	private boolean feeToOwner;
 
 	@Override
 	public void onEnable() {
 		PluginManager pm = getServer().getPluginManager();
-		logger = getLogger();
-		if (initEconomy() && economy != null) {
+		if (initEconomy()) {
 			logger.info("hooked in to Vault.");
 			pm.registerEvents(blockListener, this);
 			pm.registerEvents(playerListener, this);
-			this.config = this.getConfig();
-			item = this.config.getInt("item", 266);
-			itemName = this.config.getString("item_name", "default");
+
+			// writes all unset default options to disk and creates the config directory if not present
+			getConfig().options().copyDefaults(true);
+			saveConfig();
+
+			item = getConfig().getInt("item", 266);
+			itemName = getConfig().getString("item_name", "default");
 			if (itemName.equalsIgnoreCase("default")) {
 				itemName = Material.getMaterial(item).toString().replace("_", " ");
 			}
-			currency = this.config.getDouble("currency", 1);
-			altItem1 = this.config.getInt("alt_item1", 999);
+			currency = getConfig().getDouble("currency", 1);
+			altItem1 = getConfig().getInt("alt_item1", 999);
 			if (altItem1 != 999) {
-				altItem1Name = this.config.getString("alt_item1_name", "default");
+				altItem1Name = getConfig().getString("alt_item1_name", "default");
 				if (altItem1Name.equalsIgnoreCase("default")) {
 					altItem1Name = Material.getMaterial(altItem1).toString().replace("_", " ");
 				}
-				altItem1Curr = this.config.getDouble("alt_item1_curr", 0);
+				altItem1Curr = getConfig().getDouble("alt_item1_curr", 0);
 			}
-			altItem2 = this.config.getInt("alt_item2", 999);
+			altItem2 = getConfig().getInt("alt_item2", 999);
 			if (altItem2 != 999) {
-				altItem2Name = this.config.getString("alt_item2_name", "default");
+				altItem2Name = getConfig().getString("alt_item2_name", "default");
 				if (altItem2Name.equalsIgnoreCase("default")) {
 					altItem2Name = Material.getMaterial(altItem2).toString().replace("_", " ");
 				}
-				altItem2Curr = this.config.getDouble("alt_item2_curr", 0);
+				altItem2Curr = getConfig().getDouble("alt_item2_curr", 0);
 			}
-			depositFee = this.config.getDouble("deposit_fee", 0);
-			withdrawFee = this.config.getDouble("withdraw_fee", 0);
-			percentFee = this.config.getBoolean("percentage_fee", false);
-			feeToOwner = this.config.getBoolean("fee_to_owner", true);
-			this.config.set("item", item);
-			this.config.set("item_name", itemName);
-			this.config.set("currency", currency);
-			this.config.set("alt_item1", altItem1);
-			this.config.set("alt_item1_name", altItem1Name);
-			this.config.set("alt_item1_curr", altItem1Curr);
-			this.config.set("alt_item2", altItem2);
-			this.config.set("alt_item2_name", altItem2Name);
-			this.config.set("alt_item2_curr", altItem2Curr);
-			this.config.set("deposit_fee", depositFee);
-			this.config.set("withdraw_fee", withdrawFee);
-			this.config.set("percentage_fee", percentFee);
-			this.config.set("fee_to_owner", feeToOwner);
-			this.saveConfig();
-			Material checkItem;
+			depositFee = getConfig().getDouble("deposit_fee", 0);
+			withdrawFee = getConfig().getDouble("withdraw_fee", 0);
+			percentFee = getConfig().getBoolean("percentage_fee", false);
+			feeToOwner = getConfig().getBoolean("fee_to_owner", true);
+
 			boolean checkFailed = false;
-			checkItem = Material.getMaterial(item);
-			if (checkItem == null) {
+			if (Material.getMaterial(item) == null) {
 				logger.log(Level.SEVERE, "Item ID {0} not found!", item);
 				logger.severe("will be disabled!");
 				checkFailed = true;
 			}
-			if (altItem1 != 999) {
-				checkItem = Material.getMaterial(altItem1);
-				if (checkItem == null) {
-					logger.log(Level.SEVERE, "Item ID {0} not found!", altItem1);
-					logger.severe("will be disabled!");
-					checkFailed = true;
-				}
+			if (altItem1 != 999 && Material.getMaterial(altItem1) == null) {
+				logger.log(Level.SEVERE, "Item ID {0} not found!", altItem1);
+				logger.severe("will be disabled!");
+				checkFailed = true;
 			}
-			if (altItem2 != 999) {
-				checkItem = Material.getMaterial(altItem2);
-				if (checkItem == null) {
-					logger.log(Level.SEVERE, "Item ID {0} not found!", altItem2);
-					logger.severe("will be disabled!");
-					checkFailed = true;
-				}
+			if (altItem2 != 999 && Material.getMaterial(altItem2) == null) {
+				logger.log(Level.SEVERE, "Item ID {0} not found!", altItem2);
+				logger.severe("will be disabled!");
+				checkFailed = true;
 			}
 			if (checkFailed) {
 				pm.disablePlugin(this);
@@ -230,5 +206,9 @@ public class ATMsigns extends JavaPlugin {
 	double roundTwoDecimals(double d) {
 		DecimalFormat twoDForm = new DecimalFormat("#.##");
 		return Double.valueOf(twoDForm.format(d));
+	}
+
+	@Override
+	public void onDisable() {
 	}
 }
