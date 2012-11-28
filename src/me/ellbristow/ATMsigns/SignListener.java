@@ -32,12 +32,16 @@ public class SignListener implements Listener {
                 if (sign.getLine(3).isEmpty()) {
                     sign.setLine(3, ChatColor.GRAY + player.getName());
                 } else if (!sign.getLine(3).equalsIgnoreCase(player.getName())) {
-                    OfflinePlayer target = Bukkit.getOfflinePlayer(sign.getLine(3).toString());
-                    if (target == null || !target.hasPlayedBefore()) {
-                        player.sendMessage(ChatColor.RED + "Player " + ChatColor.WHITE + sign.getLine(3).toString() + ChatColor.RED + " not found!");
-                        return;
+                    if (sign.getLine(3).equalsIgnoreCase("Server")) {
+                        sign.setLine(3, ChatColor.GRAY + "Server");
+                    } else {
+                        OfflinePlayer target = Bukkit.getOfflinePlayer(sign.getLine(3).toString());
+                        if (target == null || !target.hasPlayedBefore()) {
+                            player.sendMessage(ChatColor.RED + "Player " + ChatColor.WHITE + sign.getLine(3).toString() + ChatColor.RED + " not found!");
+                            return;
+                        }
+                        sign.setLine(3, ChatColor.GRAY + target.getName());
                     }
-                    sign.setLine(3, ChatColor.GRAY + target.getName());
                 } else {
                     sign.setLine(3, ChatColor.GRAY + player.getName());
                 }

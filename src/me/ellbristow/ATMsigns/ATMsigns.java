@@ -134,7 +134,7 @@ public class ATMsigns extends JavaPlugin {
                 }
                 economy.withdrawPlayer(player.getName(), fee);
                 player.sendMessage(ChatColor.GOLD + "Deposit Fee: " + ChatColor.WHITE + economy.format(fee));
-                if (feeToOwner) {
+                if (feeToOwner && !owner.equalsIgnoreCase("Server")) {
                     economy.depositPlayer(owner, fee);
                     if (getServer().getOfflinePlayer(owner).isOnline()) {
                         Player target = getServer().getPlayer(owner);
@@ -181,7 +181,7 @@ public class ATMsigns extends JavaPlugin {
                 player.sendMessage(ChatColor.GREEN + "Withdrawn: " + ChatColor.GOLD + quant + " " + itemName + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) (quant * currency)).replace(".00", ""));
                 if (fee != 0) {
                     player.sendMessage(ChatColor.GOLD + "Withdrawl Fee: " + ChatColor.WHITE + economy.format(fee));
-                    if (feeToOwner) {
+                    if (feeToOwner && !owner.equalsIgnoreCase("Server")) {
                         economy.depositPlayer(owner, fee);
                         if (getServer().getOfflinePlayer(owner).isOnline()) {
                             getServer().getPlayer(owner).sendMessage(ChatColor.GOLD + "ATM fee of " + ChatColor.WHITE + fee + ChatColor.GOLD + " received from " + ChatColor.WHITE + player.getName());
