@@ -176,7 +176,7 @@ public class ATMsigns extends JavaPlugin {
         if (economy.has(player.getName(), (quant * currency) + fee)) {
             // Enough in account
             if (player.getItemInHand().getTypeId() == 0 || (player.getItemInHand().getTypeId() == item && player.getItemInHand().getAmount() < player.getItemInHand().getType().getMaxStackSize())) {
-                player.setItemInHand(new ItemStack(item, player.getItemInHand().getAmount() + 1));
+                player.setItemInHand(new ItemStack(item, player.getItemInHand().getAmount() + quant));
                 economy.withdrawPlayer(player.getName(), (quant * currency) + fee);
                 player.sendMessage(ChatColor.GREEN + "Withdrawn: " + ChatColor.GOLD + quant + " " + itemName + ChatColor.GREEN + " for " + ChatColor.GOLD + economy.format((double) (quant * currency)).replace(".00", ""));
                 if (fee != 0) {
